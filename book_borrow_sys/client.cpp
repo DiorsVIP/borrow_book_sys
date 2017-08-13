@@ -1025,14 +1025,14 @@ bool sea_books_info(TCPClient &client)//查询书籍信息
         }
     }while(non_stop);
 }
-string temp_isbn;
-string temp_name;
-Json::Value books;
-bool borrow_book_name(TCPClient &client)//按书名借阅图书
+string temp_isbn;    //查询和借阅函数所需要的ISBN
+string temp_name;    //查询和借阅函数所需要的书名
+bool borrow_book_name(TCPClient &client) //按书名借阅图书
 {
     bool non_stop = true;
     Json::Value book;
     string nu("");
+
     book["ISBN"] = nu.c_str();
     book["book_name"] = temp_name.c_str();
     book["publish_house"] = nu.c_str();
@@ -1042,24 +1042,30 @@ bool borrow_book_name(TCPClient &client)//按书名借阅图书
 
     string out = book.toStyledString();
     memcpy(client.data_buffer,out.c_str(),out.size());
-    if(client.send_to_serv(out.size(),BOR_BOOK) == false){
+
+    if(client.send_to_serv(out.size(),BOR_BOOK) == false)
+    {
         cout << "发送数据失败"<<endl;
         return false;
     }
-    if(client.recv_from_serv() == false){
+    if(client.recv_from_serv() == false)
+    {
         cout << "接收服务器发来的消息失败"<<endl;
         return false;
     }
     NetPacketHeader *phead = (NetPacketHeader*)client.data_buffer;
-    if(phead -> wOpcode == BOR_BOOK_YES){
+    if(phead -> wOpcode == BOR_BOOK_YES)
+    {
         cout << "借阅成功"<<endl;
         return true;
     }
-    if(phead -> wOpcode == SEA_BOOKS_INFO_NO){
+    if(phead -> wOpcode == SEA_BOOKS_INFO_NO)
+    {
         cout << "书籍不存在,无法借阅"<<endl;
         return false;
     }
-    if(phead -> wOpcode == BOR_BOOK_NO){
+    if(phead -> wOpcode == BOR_BOOK_NO)
+    {
         cout << "借阅失败"<<endl;
         return false;
     }
@@ -1070,147 +1076,101 @@ bool borrow_isbn(TCPClient &client)//按ISB号借阅图书
     bool non_stop = true;
     while(non_stop)
     {
-    Json:: Value book;
-    string nu("");
-    book["ISBN"] = temp_isbn.c_str();
-    book["book_name"] = nu.c_str();
-    book["publish_house"] = nu.c_str();
-    book["author"] = nu.c_str();
-    book["count"] = nu.c_str();
-    book["stat"] = nu.c_str();
+        Json:: Value book;
+        string nu("");
+        book["ISBN"] = temp_isbn.c_str();
+        book["book_name"] = nu.c_str();
+        book["publish_house"] = nu.c_str();
+        book["author"] = nu.c_str();
+        book["count"] = nu.c_str();
+        book["stat"] = nu.c_str();
 
-    string out = book.toStyledString();
-    memcpy(client.data_buffer,out.c_str(),out.size());
-    if(client.send_to_serv(out.size(),BOR_BOOK) == false){
-        cout << "发送数据失败"<<endl;
-        return false;
-        
-    }
-    if(client.recv_from_serv() == false){
-        cout << "接收服务器发来的消息失败"<<endl;
-        return false;
-    }
-    NetPacketHeader *phead = (NetPacketHeader*)client.data_buffer;
-    if(phead -> wOpcode == BOR_BOOK_YES){
-        cout << "借阅成功"<< endl;
-        return true;
-    }
-    if(phead -> wOpcode == SEA_BOOKS_INFO_NO){
-        cout << "书籍不存在,无法借阅" << endl;
-        return false;
-    }
-    if(phead -> wOpcode == BOR_BOOK_NO){
-        cout << "借阅失败" << endl;
-        return false;
-    }
- 
-    }
-}
-bool get_borrow_book_infor(TCPClient &client)//获取所借阅图书的相关信息
-{
-    bool non_stop = true;
-    Json::Reader reader;
-
-    books["ISBN"] = temp_isbn.c_str();
-    books["book_name"] = temp_name.c_str();
-    string out = books.toStyledString();
-    memcpy(client.data_buffer,out.c_str(),out.size());
-    if(client.send_to_serv(out.size(),GET_BOR_BOOK) == false){
-        cout << "发送数据失败"<<endl;
-        return false;
-    }
-    if(client.recv_from_serv() == false){
-        cout << "get接收服务器发来的消息失败"<<endl;
-        return false;
-    }
-
-
-    NetPacket *phead=(NetPacket*)client.data_buffer;
-    
-    string str(phead->Data);
-     
-    if (reader.parse(str,books) < 0)
-    {
-        cout << "json解析失败" << endl;
-        return false;
-    }
-
-    
-}
-bool add_borrow_book_infor(TCPClient &client)//将借阅记录放入数据库中
-{
-    bool non_stop = true;
-    Json::Value account_book;
-    string account,ISBN,book_name;
-    
-        account_book["book_name"] = books["book_name"].asString();
-        account_book["ISBN"] = books["ISBN"].asString();
-
-        string out = account_book.toStyledString();
+        string out = book.toStyledString();
         memcpy(client.data_buffer,out.c_str(),out.size());
-        if(client.send_to_serv(out.size(),ADD_BOR_BOOK )== false){
-            cout << "发送数据失败!" << endl;
+
+        if(client.send_to_serv(out.size(),BOR_BOOK) == false)
+        {
+            cout << "发送数据失败"<<endl;
             return false;
         }
-        if(client.recv_from_serv() == false){
-             cout << "接收数据失败"<<endl;
-             return false;
-        }
-        else
+        if(client.recv_from_serv() == false)
         {
-            NetPacketHeader *phead = (NetPacketHeader*)client.data_buffer;
-            if(phead -> wOpcode == ADD_BOR_BOOK_YES);
-        cout << endl;
+            cout << "接收服务器发来的消息失败"<<endl;
+            return false;
+        }
+        NetPacketHeader *phead = (NetPacketHeader*)client.data_buffer;
+        if(phead -> wOpcode == BOR_BOOK_YES)
+        {
+            cout << "借阅成功"<< endl;
+            return true;
+        }
+        if(phead -> wOpcode == SEA_BOOKS_INFO_NO)
+        {
+            cout << "书籍不存在,无法借阅" << endl;
+            return false;
+        }
+        if(phead -> wOpcode == BOR_BOOK_NO)
+        {
+            cout << "借阅失败" << endl;
+            return false;
+        }
     }
-    return true;
 }
+
 bool borrow_book_infor(TCPClient &client)//查阅借阅信息
 {
     Json::Value book;
     Json::Value book_recv;
     Json::Reader reader;
     bool non_stop = true;
-    if(client.send_to_serv(0,SEA_BOR_BOOK) == false){
+
+    if(client.send_to_serv(0,SEA_BOR_BOOK) == false)
+    {
         cout << "发送数据失败"<<endl;
         return false;
     }
     cout << "借阅信息如下:"<<endl;
-    cout <<"用户名   ISBN    书籍名称　　"<<endl;
+    cout <<"用户名   ISBN    书籍名称　借书日期　"<<endl;
     do{
-        if(client.recv_from_serv() == false){
+        if(client.recv_from_serv() == false)
+        {
             cout << "从服务器接受信息失败"<<endl;
             return false;
         }
         NetPacket *phead = (NetPacket*)client.data_buffer;
-        if(phead ->Header. wOpcode == SEA_BOR_BOOK_YES){
-            //当前接收正确
+        if(phead ->Header. wOpcode == SEA_BOR_BOOK_YES)
+        {
             string str(phead -> Data);
-            if(reader.parse(str,book_recv) < 0){
+            if(reader.parse(str,book_recv) < 0)
+            {
                 cout << "json解析失败"<<endl;
                 return false;
             }
-            else{
+            else
+            {
                 cout << book_recv["account"].asString() <<"\t"
                 << book_recv["ISBN"].asString() << "\t"
-                << book_recv["book_name"].asString() << endl;
+                << book_recv["book_name"].asString() << "\t"
+                << book_recv["borrow_date"].asString() << endl;
             }
         }
-        else if(phead -> Header.wOpcode == SEA_BOR_BOOK_NO){
+        else if(phead -> Header.wOpcode == SEA_BOR_BOOK_NO)
+        {
             //当前接收错误
             cout << "读取错误,请稍后再试"<<endl;
             return false;
         }
-        else if(phead -> Header.wOpcode == SEA_BOR_BOOK){
+        else if(phead -> Header.wOpcode == SEA_BOR_BOOK)
+        {
             //读取完成
             break;
         }
     }while(non_stop);
-    
-
 }
 bool borrow_book(TCPClient &client)
 {
     bool non_stop = true;
+    int temp_number;
     Json::Value book;
     string ISBN,book_name,publish_house,author,count,stat;
     while(non_stop)
@@ -1233,31 +1193,29 @@ bool borrow_book(TCPClient &client)
                     temp_isbn.clear();
                     cout << "请输入ISBN"<<endl;
                     cin >> temp_isbn;
+                    cout << "请输入借阅图书的数量"<<endl;
+                    cin >> temp_number;
                     temp_name = "";
-                    get_borrow_book_infor(client);
-                    if(borrow_isbn(client)==true)
-                    {
-                        add_borrow_book_infor(client);
-                    
-                   }
+                    for(int i = 1;i<=temp_number;i++)
+                        borrow_isbn(client);
                     temp_isbn.clear();
-                break;
+                    break;
                 case 2:
                     temp_name.clear();
                     cout << "请输入所要借阅书籍名称:"<<endl;
                     cin >> temp_name;
                     temp_isbn = "";
-                    get_borrow_book_infor(client);
-                    if(borrow_book_name(client)==true)
-                    {
-                        add_borrow_book_infor(client);
-                    }
+                    cout << "请输入借阅图书的数量"<<endl;
+                    cin >> temp_number;
+                    for(int i = 1;i<=temp_number;i++)
+                        borrow_book_name(client);
                     temp_name.clear();
                     break;
                 case 3:
                     borrow_book_infor(client);
                     break;
-                case 4:cout << "退出"<< endl;return true;      
+                case 4:cout << "退出"<< endl;
+                return true;      
             }
             
     }
@@ -1277,24 +1235,29 @@ bool ret_book_name(TCPClient &client)//按书名归还
 
     string out = book.toStyledString();
     memcpy(client.data_buffer,out.c_str(),out.size());
-    if(client.send_to_serv(out.size(),RET_BOOK) == false){
+    if(client.send_to_serv(out.size(),RET_BOOK) == false)
+    {
         cout << "发送数据失败"<<endl;
         return false;
     }
-    if(client.recv_from_serv() == false){
+    if(client.recv_from_serv() == false)
+    {
         cout << "接收服务器发来的消息失败"<<endl;
         return false;
     }
     NetPacketHeader *phead = (NetPacketHeader*)client.data_buffer;
-    if(phead -> wOpcode == RET_BOOK_YES){
+    if(phead -> wOpcode == RET_BOOK_YES)
+    {
         cout << "归还成功"<<endl;
         return true;
     }
-    if(phead -> wOpcode == SEA_BOOKS_INFO_NO){
+    if(phead -> wOpcode == SEA_BOOKS_INFO_NO)
+    {
         cout << "无此书籍的借阅记录"<<endl;
         return false;
     }
-    if(phead -> wOpcode == RET_BOOK_NO){
+    if(phead -> wOpcode == RET_BOOK_NO)
+    {
         cout << "归还失败"<<endl;
         return false;
     }
@@ -1305,211 +1268,98 @@ bool ret_isbn(TCPClient &client)//按isbn归还
     bool non_stop = true;
     while(non_stop)
     {
-    Json:: Value book;
-    string nu("");
-    book["ISBN"] = temp_isbn.c_str();
-    book["book_name"] = nu.c_str();
-    book["publish_house"] = nu.c_str();
-    book["author"] = nu.c_str();
-    book["count"] = nu.c_str();
-    book["stat"] = nu.c_str();
+        Json:: Value book;
+        string nu("");
+        book["ISBN"] = temp_isbn.c_str();
+        book["book_name"] = nu.c_str();
+        book["publish_house"] = nu.c_str();
+        book["author"] = nu.c_str();
+        book["count"] = nu.c_str();
+        book["stat"] = nu.c_str();
 
-    string out = book.toStyledString();
-    memcpy(client.data_buffer,out.c_str(),out.size());
-    if(client.send_to_serv(out.size(),RET_BOOK) == false){
-        cout << "发送数据失败"<<endl;
-        return false;
-        
-    }
-    if(client.recv_from_serv() == false){
-        cout << "接收服务器发来的消息失败"<<endl;
-        return false;
-    }
-    NetPacketHeader *phead = (NetPacketHeader*)client.data_buffer;
-    if(phead -> wOpcode == RET_BOOK_YES){
-        cout << "归还成功"<< endl;
-        return true;
-    }
-    if(phead -> wOpcode == SEA_BOOKS_INFO_NO){
-        cout << "无此书籍的借阅记录" << endl;
-        return false;
-    }
-    if(phead -> wOpcode == RET_BOOK_NO){
-        cout << "归还失败" << endl;
-        return false;
-    }
- 
-    }
-}
-bool get_ret_book_infor(TCPClient &client)//获取所借阅图书的相关信息
-{
-    bool non_stop = true;
-    Json::Reader reader;
-
-    books["ISBN"] = temp_isbn.c_str();
-    books["book_name"] = temp_name.c_str();
-    string out = books.toStyledString();
-    memcpy(client.data_buffer,out.c_str(),out.size());
-    if(client.send_to_serv(out.size(),GET_RET_BOOK) == false){
-        cout << "发送数据失败"<<endl;
-        return false;
-    }
-    if(client.recv_from_serv() == false){
-        cout << "接收服务器发来的消息失败"<<endl;
-        return false;
-    }
-
-
-    NetPacket *phead=(NetPacket*)client.data_buffer;
-    
-    string str(phead->Data);
-     
-    if (reader.parse(str,books) < 0)
-    {
-        cout << "json解析失败" << endl;
-        return false;
-    }
-
-    
-}
-bool del_ret_book_name(TCPClient &client)//按照书名删除借阅记录
-{
-    bool non_stop = true;
-    Json::Value book;
-    string nu("");
-    book["ISBN"] = nu.c_str();
-    book["book_name"] = temp_name.c_str();
-
-    string out = book.toStyledString();
-    memcpy(client.data_buffer,out.c_str(),out.size());
-    if(client.send_to_serv(out.size(),DEL_RET_BOOK) == false){
-        cout << "发送数据失败"<<endl;
-        return false;
-    }
-    if(client.recv_from_serv() == false){
-        cout << "接收服务器发来的消息失败"<<endl;
-        return false;
-    }
-    NetPacketHeader *phead = (NetPacketHeader*)client.data_buffer;
-    if(phead -> wOpcode == DEL_RET_BOOK_YES){
-        return true;
-    }
-    if(phead -> wOpcode == SEA_BOOKS_INFO_NO){
-        return false;
-    }
-    if(phead -> wOpcode == DEL_RET_BOOK_NO){
-        return false;
-    }
-  
-}
-bool del_ret_book_isbn(TCPClient &client)//按ISBN删除借阅记录
-{
-    bool non_stop = true;
-    while(non_stop)
-    {
-    Json:: Value book;
-    string nu("");
-    book["ISBN"] = temp_isbn.c_str();
-    book["book_name"] = nu.c_str();
-    book["publish_house"] = nu.c_str();
-    book["author"] = nu.c_str();
-    book["count"] = nu.c_str();
-    book["stat"] = nu.c_str();
-
-    string out = book.toStyledString();
-    memcpy(client.data_buffer,out.c_str(),out.size());
-    if(client.send_to_serv(out.size(),DEL_RET_BOOK) == false){
-        cout << "发送数据失败"<<endl;
-        return false;
-        
-    }
-    if(client.recv_from_serv() == false){
-        cout << "接收服务器发来的消息失败"<<endl;
-        return false;
-    }
-    NetPacketHeader *phead = (NetPacketHeader*)client.data_buffer;
-    if(phead -> wOpcode == DEL_RET_BOOK_YES){
-        return true;
-    }
-    if(phead -> wOpcode == SEA_BOOKS_INFO_NO){
-        return false;
-    }
-    if(phead -> wOpcode == DEL_RET_BOOK_NO){
-        return false;
-    }
- 
-    }
-}
-bool add_ret_book_infor(TCPClient &client)//将借阅记录放入数据库中
-{
-    bool non_stop = true;
-    Json::Value account_book;
-    string account,ISBN,book_name;
-    
-        account_book["book_name"] = books["book_name"].asString();
-      account_book["ISBN"] = books["ISBN"].asString();
-
-        string out = account_book.toStyledString();
+        string out = book.toStyledString();
         memcpy(client.data_buffer,out.c_str(),out.size());
-        if(client.send_to_serv(out.size(),ADD_RET_BOOK )== false){
-            cout << "发送数据失败!" << endl;
+        if(client.send_to_serv(out.size(),RET_BOOK) == false)
+        {
+            cout << "发送数据失败"<<endl;
+            return false;    
+        }
+        if(client.recv_from_serv() == false)
+        {
+            cout << "接收服务器发来的消息失败"<<endl;
             return false;
         }
-        if(client.recv_from_serv() == false){
-             cout << "接收数据失败"<<endl;
-             return false;
-        }else{
-            NetPacketHeader *phead = (NetPacketHeader*)client.data_buffer;
-            if(phead -> wOpcode == ADD_RET_BOOK_YES){
-                cout << "借阅书籍添加成功" << endl;
-            }
-        cout << endl;
+        NetPacketHeader *phead = (NetPacketHeader*)client.data_buffer;
+        if(phead -> wOpcode == RET_BOOK_YES)
+        {
+            cout << "归还成功"<< endl;
+            return true;
+        }
+        if(phead -> wOpcode == SEA_BOOKS_INFO_NO)
+        {
+            cout << "无此书籍的借阅记录" << endl;
+            return false;
+        }
+        if(phead -> wOpcode == RET_BOOK_NO)
+        {
+            cout << "归还失败" << endl;
+            return false;
+        }
     }
-    return true;
 }
+
+
+
 bool ret_book_infor(TCPClient &client)//查阅借阅信息
 {
     Json::Value book;
     Json::Value book_recv;
     Json::Reader reader;
     bool non_stop = true;
-    if(client.send_to_serv(0,SEA_RET_BOOK) == false){
+    if(client.send_to_serv(0,SEA_RET_BOOK) == false)
+    {
         cout << "发送数据失败"<<endl;
         return false;
     }
     cout << "借阅信息如下:"<<endl;
-    cout <<"用户名   ISBN    书籍名称　　借书日期　　　"<<endl;
+    cout <<"用户名   ISBN    书籍名称　　归还日期　　　"<<endl;
     do{
-        if(client.recv_from_serv() == false){
+        if(client.recv_from_serv() == false)
+        {
             cout << "从客户端接受信息失败"<<endl;
             return false;
         }
         NetPacket *phead = (NetPacket*)client.data_buffer;
-        if(phead ->Header. wOpcode == SEA_RET_BOOK_YES){
+        if(phead ->Header. wOpcode == SEA_RET_BOOK_YES)
+        {
             //当前接收正确
             string str(phead -> Data);
-            if(reader.parse(str,book_recv) < 0){
+            if(reader.parse(str,book_recv) < 0)
+            {
                 cout << "json解析失败"<<endl;
                 return false;
             }
-            else{
+            else
+            {
                 cout << book_recv["account"].asString() <<"\t"
                 << book_recv["ISBN"].asString() << "\t"
-                << book_recv["book_name"].asString() << endl;
+                << book_recv["book_name"].asString() << "\t"
+                << book_recv["return_date"].asString() << endl;
             }
         }
-        else if(phead -> Header.wOpcode == SEA_RET_BOOK_NO){
+        else if(phead -> Header.wOpcode == SEA_RET_BOOK_NO)
+        {
             //当前接收错误
             cout << "读取错误,请稍后再试"<<endl;
             return false;
         }
-        else if(phead -> Header.wOpcode == SEA_RET_BOOK){
+        else if(phead -> Header.wOpcode == SEA_RET_BOOK)
+        {
             //读取完成
             break;
         }
     }while(non_stop);
     
-
 }
 bool ret_book(TCPClient &client)
 {
@@ -1534,39 +1384,28 @@ bool ret_book(TCPClient &client)
             {
                 case 1:
                     temp_isbn.clear();
-                    cout << "请输入ISBN"<<endl;
+                    cout << "请输入所要归还书籍ISBN"<<endl;
                     cin >> temp_isbn;
                     temp_name = "";
-                    get_ret_book_infor(client);
-                    if(ret_isbn(client)==true)
-                    {
-                        add_ret_book_infor(client);
-                        del_ret_book_isbn(client);
-                    
-                    }
+                    ret_isbn(client);   //ISBN归还函数调用
                     temp_isbn.clear();
-                break;
+                    break;
                 case 2:
                     temp_name.clear();
-                    cout << "请输入所要借阅书籍名称:"<<endl;
+                    cout << "请输入所要归还书籍名称:"<<endl;
                     cin >> temp_name;
                     temp_isbn = "";
-                    get_ret_book_infor(client);
-                    if(ret_book_name(client)==true)
-                    {
-                        add_ret_book_infor(client);
-                        del_ret_book_name(client);
-                    }
+                    ret_book_name(client);  //书名归还函数调用
                     temp_name.clear();
                     break;
                 case 3:
                     ret_book_infor(client);
                     break;
-                case 4:cout << "退出"<< endl;return true;      
+                case 4:
+                    cout << "退出"<< endl;
+                    return true;      
             }
-            
     }
-    
 }
 
 void Admin_menu(TCPClient &client) //管理员菜单

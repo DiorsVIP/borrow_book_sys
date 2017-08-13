@@ -50,36 +50,21 @@ enum eNetOpcode
     SEA_BOOKS_ALL_INFO,//搜索全部
     SEA_BOOKS_ALL_INFO_YES,//搜索全部成功
     SEA_BOOKS_ALL_INFO_NO,//搜索全部失败
-    BOR_BOOK,
-    BOR_BOOK_YES,
-    BOR_BOOK_NO,
-    RET_BOOK,
-    RET_BOOK_YES,
-    RET_BOOK_NO,
-    SEA_BOOK,
-    SEA_BOOK_YES,
-    SEA_BOOK_NO,
-    SEA_BOR_BOOK,
-    SEA_BOR_BOOK_YES,
-    SEA_BOR_BOOK_NO,
-    GET_BOR_BOOK,
-    GET_BOR_BOOK_NO,
-    GET_BOR_BOOK_YES,
-    ADD_BOR_BOOK,
-    ADD_BOR_BOOK_YES,
-    ADD_BOR_BOOK_NO, 
-    SEA_RET_BOOK,
-    SEA_RET_BOOK_YES,
-    SEA_RET_BOOK_NO,
-    GET_RET_BOOK,
-    GET_RET_BOOK_NO,
-    GET_RET_BOOK_YES,
-    ADD_RET_BOOK,
-    ADD_RET_BOOK_YES,
-    ADD_RET_BOOK_NO,
-    DEL_RET_BOOK,
-    DEL_RET_BOOK_NO,
-    DEL_RET_BOOK_YES
+    BOR_BOOK,           //借阅书籍
+    BOR_BOOK_YES,       //借阅成功
+    BOR_BOOK_NO,        //借阅失败
+    RET_BOOK,           //归还书籍
+    RET_BOOK_YES,       //归还成功
+    RET_BOOK_NO,        //归还失败
+    SEA_BOOK,           //查询书籍
+    SEA_BOOK_YES,       //查询成功
+    SEA_BOOK_NO,        //查询失败
+    SEA_BOR_BOOK,       //查看借阅记录
+    SEA_BOR_BOOK_YES,   //查看借阅记录成功
+    SEA_BOR_BOOK_NO,    //查看借阅记录失败
+    SEA_RET_BOOK,       //查询归还记录
+    SEA_RET_BOOK_YES,   //查询归还记录成功
+    SEA_RET_BOOK_NO,    //查询归还记录失败
 };
 
 
